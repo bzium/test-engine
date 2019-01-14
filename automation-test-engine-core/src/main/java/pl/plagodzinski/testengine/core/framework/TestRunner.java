@@ -21,7 +21,7 @@ public class TestRunner {
             for (Class<?> aClass : configuration.getClassList()) {
                 junit.run(new EngineCucumberRunner(aClass, configuration));
             }
-        } catch (InitializationError|IOException e) {
+        } catch (InitializationError e) {
             log.error(e);
         }
     }
