@@ -2,6 +2,7 @@ package pl.plagodzinski.testengine.core.config;
 
 import lombok.Getter;
 import lombok.Setter;
+import pl.plagodzinski.testengine.core.framework.TestModuleTypes;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public class Configuration {
     private List<Country> countries;
     private List<Environment> environments;
     private List<String> additionalTags;
-    private List<Class<?>> classList;
+    private List<TestModuleTypes> testTypes;
 }

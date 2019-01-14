@@ -50,7 +50,7 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         runtimeOptions.getFeaturePaths().add("classpath:features/");
 
         // Add package with cucumber steps
-        runtimeOptions.getGlue().add(clazz.getPackage().getName());
+        //runtimeOptions.getGlue().add(clazz.getPackage().getName());
 
         // Add customized reporter
         runtimeOptions.addPlugin(new EngineReporter());

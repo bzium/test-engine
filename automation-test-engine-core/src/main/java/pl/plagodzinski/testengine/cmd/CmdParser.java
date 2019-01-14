@@ -6,6 +6,7 @@ import pl.plagodzinski.testengine.core.config.Configuration;
 import pl.plagodzinski.testengine.core.config.Country;
 import pl.plagodzinski.testengine.core.config.Environment;
 import pl.plagodzinski.testengine.core.framework.AutomationTestEngine;
+import pl.plagodzinski.testengine.core.framework.TestModuleTypes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,9 +27,10 @@ class CmdParser {
         options.addOption(buildOption("c", "country", true, "Set test country"));
         options.addOption(buildOption("e", "environment", true, "Set test environment"));
         options.addOption(buildOption("t", "tags", true, "Set tags"));
-        options.addOption(buildOption("x", "testClass", true, "Set test class"));
+        options.addOption(buildOption("m", "test module", true, "test module"));
     }
 
+    @SuppressWarnings("unchecked")
     void parse() {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd;
@@ -36,7 +38,7 @@ class CmdParser {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("h"))
                 help();
-            else if (cmd.hasOption("c") || cmd.hasOption("e") || cmd.hasOption("t") || cmd.hasOption("x")) {
+            else if (cmd.hasOption("c") || cmd.hasOption("e") || cmd.hasOption("t") || cmd.hasOption("m")) {
                 Configuration configuration = new Configuration();
 
                 String[] countries = cmd.getOptionValues("c");
@@ -59,20 +61,12 @@ class CmdParser {
                     configuration.setAdditionalTags(Arrays.asList(additionalTags));
                 }
 
-                String[] testClassNames = cmd.getOptionValues("x");
-                if (testClassNames != null) {
-                    List<String> classNames = Arrays.asList(testClassNames);
-                    log.info("Set classes: " + Arrays.toString(testClassNames));
-                    List<Class<?>> classList = classNames.stream().map(className -> {
-                        try {
-                            return Class.forName(className);
-                        } catch (ClassNotFoundException e) {
-                            log.error("Can't find class with name " + className);
-                            throw new IllegalStateException("Can't find class with name " + className);
-                        }
-                    }).collect(Collectors.toList());
-
-                    configuration.setClassList(classList);
+                String[] moduleNames = cmd.getOptionValues("m");
+                if(moduleNames != null) {
+                    log.info("Set test modules: " + Arrays.toString(moduleNames));
+                    List<String> moduleToUse = Arrays.asList(moduleNames);
+                    List<TestModuleTypes> modulesList = moduleToUse.stream().map(TestModuleTypes::valueOf).collect(Collectors.toList());
+                    configuration.setTestTypes(modulesList);
                 }
 
                 AutomationTestEngine automationTestEngine = new AutomationTestEngine(configuration);
