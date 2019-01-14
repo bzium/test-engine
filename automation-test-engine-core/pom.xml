@@ -101,7 +101,7 @@
                 <configuration>
                     <mainClass>pl.plagodzinski.testengine.cmd.EngineStarter</mainClass>
                     <commandlineArgs>
-                        -c PL MX -x cucumberTraining.TestModule
+                        -c PL MX -m EXAMPLE1
                     </commandlineArgs>
                 </configuration>
             </plugin>
