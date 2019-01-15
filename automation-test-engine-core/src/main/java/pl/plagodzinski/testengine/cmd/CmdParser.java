@@ -24,10 +24,10 @@ class CmdParser {
 
         this.args = args;
         options.addOption(buildOption("h", "help", false, "Show help."));
-        options.addOption(buildOption("c", "country", true, "Set test country"));
-        options.addOption(buildOption("e", "environment", true, "Set test environment"));
-        options.addOption(buildOption("t", "tags", true, "Set tags"));
-        options.addOption(buildOption("m", "test module", true, "test module"));
+        options.addOption(buildOption("c", "country", true, "Set test country(ies)"));
+        options.addOption(buildOption("e", "environment", true, "Set test environment(s)"));
+        options.addOption(buildOption("t", "tag", true, "Set tag(s)"));
+        options.addOption(buildOption("m", "test_module", true, "Set test module(s)"));
     }
 
     @SuppressWarnings("unchecked")

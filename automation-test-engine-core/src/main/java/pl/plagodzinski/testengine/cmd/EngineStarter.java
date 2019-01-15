@@ -5,9 +5,7 @@ package pl.plagodzinski.testengine.cmd;
  */
 public class EngineStarter {
     public static void main(String[] args) {
-        if(args.length > 0) {
-            CmdParser cmdParser = new CmdParser(args);
-            cmdParser.parse();
-        }
+        CmdParser cmdParser = new CmdParser(args);
+        cmdParser.parse();
     }
 }
