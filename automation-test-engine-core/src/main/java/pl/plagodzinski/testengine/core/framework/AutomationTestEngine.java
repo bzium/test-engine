@@ -1,19 +1,24 @@
 package pl.plagodzinski.testengine.core.framework;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import pl.plagodzinski.testengine.core.config.Configuration;
 
 /**
  * Created by pawel on 01/12/2018.
  */
 
-@AllArgsConstructor
+@Component
 public class AutomationTestEngine {
 
-    private Configuration configuration;
+    private TestRunner testRunner;
 
-    public void runTests() {
-        TestRunner testRunner = new TestRunner();
+    @Autowired
+    AutomationTestEngine(TestRunner testRunner) {
+        this.testRunner = testRunner;
+    }
+
+    public void runTests(Configuration configuration) {
         testRunner.setupAndRunTests(configuration);
     }
 }

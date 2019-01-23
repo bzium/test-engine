@@ -11,6 +11,7 @@
     <modules>
         <module>automation-test-engine-example</module>
         <module>automation-test-engine-core</module>
+        <module>automation-test-engine-api</module>
     </modules>
 
     <dependencyManagement>
@@ -64,6 +65,11 @@
                 <groupId>info.cukes</groupId>
                 <artifactId>cucumber-core</artifactId>
                 <version>1.2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>5.1.4.RELEASE</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

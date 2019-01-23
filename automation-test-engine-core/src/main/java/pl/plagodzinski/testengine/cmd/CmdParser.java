@@ -2,81 +2,42 @@ package pl.plagodzinski.testengine.cmd;
 
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.cli.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import pl.plagodzinski.testengine.cmd.commands.CmdCommand;
 import pl.plagodzinski.testengine.core.config.Configuration;
-import pl.plagodzinski.testengine.core.config.Country;
-import pl.plagodzinski.testengine.core.config.Environment;
 import pl.plagodzinski.testengine.core.framework.AutomationTestEngine;
-import pl.plagodzinski.testengine.core.framework.TestModuleTypes;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by pawel on 01/12/2018.
  */
 @Log4j
+@Component
 class CmdParser {
-    private String[] args = null;
     private Options options = new Options();
 
-    CmdParser(String[] args) {
+    private List<CmdCommand> commandList;
+    private AutomationTestEngine engine;
 
-        this.args = args;
-        options.addOption(buildOption("h", "help", false, "Show help."));
-        options.addOption(buildOption("c", "country", true, "Set test country(ies)"));
-        options.addOption(buildOption("e", "environment", true, "Set test environment(s)"));
-        options.addOption(buildOption("t", "tag", true, "Set tag(s)"));
-        options.addOption(buildOption("m", "test_module", true, "Set test module(s)"));
+    @Autowired
+    CmdParser(List<CmdCommand> commandList, AutomationTestEngine engine) {
+        this.commandList = commandList;
+        this.engine = engine;
     }
 
-    @SuppressWarnings("unchecked")
-    void parse() {
+    void parse(String[] args) {
         CommandLineParser parser = new DefaultParser();
-        CommandLine cmd;
         try {
-            cmd = parser.parse(options, args);
-            if (cmd.hasOption("h"))
-                help();
-            else if (cmd.hasOption("c") || cmd.hasOption("e") || cmd.hasOption("t") || cmd.hasOption("m")) {
-                Configuration configuration = new Configuration();
+            commandList.forEach(cl -> options.addOption(cl.getOption()));
 
-                String[] countries = cmd.getOptionValues("c");
-                if (countries != null) {
-                    List<String> countryStringList = Arrays.asList(countries);
-                    log.info("Set countries: " + Arrays.toString(countries));
-                    configuration.setCountries(countryStringList.stream().map(Country::valueOf).collect(Collectors.toList()));
-                }
+            CommandLine cmd = parser.parse(options, args);
+            Configuration configuration = new Configuration();
 
-                String[] environment = cmd.getOptionValues("e");
-                if (environment != null) {
-                    log.info("Set environments: " + Arrays.toString(environment));
-                    List<String> environmentList = Arrays.asList(environment);
-                    configuration.setEnvironments(environmentList.stream().map(Environment::valueOf).collect(Collectors.toList()));
-                }
-
-                String[] additionalTags = cmd.getOptionValues("t");
-                if (additionalTags != null) {
-                    log.info("Set additional tags: " + Arrays.toString(additionalTags));
-                    configuration.setAdditionalTags(Arrays.asList(additionalTags));
-                }
-
-                String[] moduleNames = cmd.getOptionValues("m");
-                if(moduleNames != null) {
-                    log.info("Set test modules: " + Arrays.toString(moduleNames));
-                    List<String> moduleToUse = Arrays.asList(moduleNames);
-                    List<TestModuleTypes> modulesList = moduleToUse.stream().map(TestModuleTypes::valueOf).collect(Collectors.toList());
-                    configuration.setTestTypes(modulesList);
-                }
-
-                AutomationTestEngine automationTestEngine = new AutomationTestEngine(configuration);
-                automationTestEngine.runTests();
-            } else {
-                log.info("Show help");
-                help();
-            }
+            commandList.forEach(cl2 -> cl2.execute(cmd, configuration));
+            engine.runTests(configuration);
         } catch (ParseException e) {
-            log.info("");
             help();
         }
     }
@@ -86,15 +47,6 @@ class CmdParser {
         HelpFormatter formater = new HelpFormatter();
         formater.printHelp("automation-test-engine", options);
         System.exit(0);
-    }
-
-    private Option buildOption(String opt, String longOpt, Boolean hasArg, String desc) {
-        Option option = new Option(opt, longOpt, hasArg, desc);
-        if (hasArg) {
-            option.setArgs(Option.UNLIMITED_VALUES);
-            option.setValueSeparator(' ');
-        }
-        return option;
     }
 
 }

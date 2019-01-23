@@ -3,7 +3,7 @@ package pl.plagodzinski.testengine.core.framework;
 
 public enum TestModuleTypes {
 
-    EXAMPLE1("cucumberTraining.TestModule");
+    EXAMPLE1("cucumberTraining.ExampleTestModule");
 
     private String configurationClassName;
 

@@ -1,34 +1,42 @@
 package pl.plagodzinski.testengine.core.framework;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j;
 import org.junit.runner.JUnitCore;
 import org.junit.runners.model.InitializationError;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import pl.plagodzinski.testengine.api.TestModule;
 import pl.plagodzinski.testengine.core.config.Configuration;
+
+import java.util.List;
 
 /**
  * Created by pawel on 01/12/2018.
  */
-
+@Component
+@Log4j
 public class TestRunner {
 
-    private final JUnitCore junit = new JUnitCore();
-    private final Logger log = Logger.getLogger(TestRunner.class);
+    private List<TestModule> testModuleList;
 
-    public void setupAndRunTests(Configuration configuration) {
-        try {
-            for (TestModuleTypes testType : configuration.getTestTypes()) {
-                try {
-                    Class<?> testModuleClass = Class.forName(testType.getConfigurationClassName());
-                    junit.run(new EngineCucumberRunner(testModuleClass, configuration));
-                } catch (ClassNotFoundException e) {
-                    log.error("Can't find class with name " + testType.getConfigurationClassName());
-                    throw new IllegalStateException("Can't find class with name " + testType.getConfigurationClassName());
+    @Autowired
+    public TestRunner(List<TestModule> testModuleList) {
+        this.testModuleList = testModuleList;
+    }
+
+    void setupAndRunTests(Configuration configuration) {
+        JUnitCore junit = new JUnitCore();
+        configuration.getModules().forEach(moduleName -> {
+            testModuleList.forEach(module -> {
+                if(module.getName().equals(moduleName)) {
+                    try {
+                        junit.run(new EngineCucumberRunner(module.getClass(), configuration));
+                    } catch (InitializationError initializationError) {
+                        log.error("Can't run module " + moduleName, initializationError);
+                    }
                 }
-
-            }
-        } catch (InitializationError e) {
-            log.error(e);
-        }
+            });
+        });
     }
 }
 

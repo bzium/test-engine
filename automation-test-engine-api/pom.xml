@@ -9,21 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>automation-test-engine-example</artifactId>
+    <artifactId>automation-test-engine-api</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>info.cukes</groupId>
-            <artifactId>cucumber-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>pl.plagodzinski</groupId>
-            <artifactId>automation-test-engine-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
     </dependencies>
 

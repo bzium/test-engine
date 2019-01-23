@@ -21,6 +21,11 @@ import pl.plagodzinski.testengine.core.config.Configuration;
 import pl.plagodzinski.testengine.core.config.Country;
 import pl.plagodzinski.testengine.core.config.Environment;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +50,8 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
 
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
+
+        listFeatureFiles(clazz);
 
         // Add futures path inside jar
         runtimeOptions.getFeaturePaths().add("classpath:features/");
@@ -132,7 +139,33 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
                 runtimeOptions.getFilters().add("@" + additionalTag);
             }
         }
+    }
 
+    private List<String> getResources(URI uri) {
+        List<String> list = new ArrayList<>();
+        try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
+            Path myPath = Paths.get(uri);
+            Files.walkFileTree(myPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    list.add(file.getFileName().toString());
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            log.error("Can't read file", e);
+        }
+        return list;
+    }
+
+    private List<String> listFeatureFiles(Class clazz) {
+        try {
+            URI uri = clazz.getResource("/features").toURI();
+            return getResources(uri);
+        } catch (URISyntaxException e) {
+            log.error("Can't build resource", e);
+            return new ArrayList<>();
+        }
     }
 
     private boolean checkPath(String path) {
