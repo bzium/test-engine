@@ -51,8 +51,6 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
 
-
-
         // Add futures path inside jar
         runtimeOptions.getFeaturePaths().add("classpath:features/");
 
@@ -161,14 +159,22 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         return list;
     }
 
-    private List<String> listFeatureFiles(Class clazz) {
+    private URI buildUri(Class clazz)  {
         try {
-            URI uri = clazz.getResource("/features").toURI();
-            return getResources(uri);
+            return new URI("jar:" + clazz.getProtectionDomain().getCodeSource().getLocation().toURI().toString() + "!/features");
         } catch (URISyntaxException e) {
-            log.error("Can't build resource", e);
-            return new ArrayList<>();
+            log.error("Can't build uri", e);
+            return null;
         }
+
+    }
+
+    private List<String> listFeatureFiles(Class clazz) {
+        URI uri = buildUri(clazz);
+        if(uri != null) {
+            return getResources(uri);
+        }
+        return new ArrayList<>();
     }
 
     private boolean checkPath(String path) {

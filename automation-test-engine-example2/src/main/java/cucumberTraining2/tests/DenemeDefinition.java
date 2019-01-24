@@ -20,7 +20,7 @@ public class DenemeDefinition {
         //driver.get(url);
     }
 
-    @Then("^Newkontrol then go$")
+    @Then("^Newkontrol then to go$")
     public void kontrolThenGo() throws Throwable {
         //String currentUrl = driver.getCurrentUrl();
         //System.out.println(currentUrl);

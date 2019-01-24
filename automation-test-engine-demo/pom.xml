@@ -83,7 +83,7 @@
                 <configuration>
                     <mainClass>pl.plagodzinski.testengine.cmd.EngineStarter</mainClass>
                     <commandlineArgs>
-                        -c PL MX -m EXAMPLE2
+                        -c PL MX -m EXAMPLE
                     </commandlineArgs>
                 </configuration>
             </plugin>

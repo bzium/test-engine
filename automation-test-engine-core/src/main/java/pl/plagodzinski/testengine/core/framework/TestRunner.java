@@ -32,6 +32,7 @@ public class TestRunner {
             configuration.getModules().forEach(moduleName -> {
                 Optional<TestModule> filteredModule = testModuleList.stream().filter(module -> module.getName().equals(moduleName)).findFirst();
                 if (filteredModule.isPresent()) {
+                    log.info("Starting tests for module " + filteredModule.get().getName());
                     try {
                         junit.run(new EngineCucumberRunner(filteredModule.get().getClass(), configuration));
                     } catch (InitializationError initializationError) {

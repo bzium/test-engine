@@ -11,6 +11,6 @@ import pl.plagodzinski.testengine.api.TestModule;
 public class ExampleTestModule implements TestModule{
     @Override
     public String getName() {
-        return "EXAMPLE1";
+        return "EXAMPLE";
     }
 }
