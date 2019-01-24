@@ -9,6 +9,7 @@ import pl.plagodzinski.testengine.api.TestModule;
 import pl.plagodzinski.testengine.core.config.Configuration;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by pawel on 01/12/2018.
@@ -25,17 +26,19 @@ public class TestRunner {
     }
 
     void setupAndRunTests(Configuration configuration) {
+        log.info(String.format("Find %s test module(s) in classpath", testModuleList.size()));
         JUnitCore junit = new JUnitCore();
         configuration.getModules().forEach(moduleName -> {
-            testModuleList.forEach(module -> {
-                if(module.getName().equals(moduleName)) {
-                    try {
-                        junit.run(new EngineCucumberRunner(module.getClass(), configuration));
-                    } catch (InitializationError initializationError) {
-                        log.error("Can't run module " + moduleName, initializationError);
-                    }
+            Optional<TestModule> filteredModule = testModuleList.stream().filter(module -> module.getName().equals(moduleName)).findFirst();
+            if (filteredModule.isPresent()) {
+                try {
+                    junit.run(new EngineCucumberRunner(filteredModule.get().getClass(), configuration));
+                } catch (InitializationError initializationError) {
+                    log.error("Can't run module " + moduleName, initializationError);
                 }
-            });
+            } else {
+                log.error("Not found module with name " + moduleName);
+            }
         });
     }
 }
