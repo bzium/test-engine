@@ -51,7 +51,7 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
 
-        listFeatureFiles(clazz);
+
 
         // Add futures path inside jar
         runtimeOptions.getFeaturePaths().add("classpath:features/");
@@ -70,6 +70,7 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
 
         final List<CucumberFeature> cucumberFeatures = runtimeOptions.cucumberFeatures(resourceLoader);
 
+
         List<CucumberFeature> filteredCucumberFeatures;
         if(conf.getCountries() == null || conf.getCountries().isEmpty()) {
             filteredCucumberFeatures = cucumberFeatures.stream().filter(cf -> checkPath(cf.getPath())).collect(Collectors.toList());
@@ -77,6 +78,8 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
             filteredCucumberFeatures = cucumberFeatures;
         }
 
+        List<String> featuresInJar = listFeatureFiles(clazz);
+        filteredCucumberFeatures = filteredCucumberFeatures.stream().filter(cf -> isStoreInJar(cf.getPath(), featuresInJar)).collect(Collectors.toList());
 
         JUnitOptions jUnitOptions = new JUnitOptions(Collections.EMPTY_LIST);
         jUnitReporter = new JUnitReporter(runtimeOptions.reporter(classLoader), runtimeOptions.formatter(classLoader), runtimeOptions.isStrict(), jUnitOptions);
@@ -174,4 +177,8 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         return countryOptional.isPresent();
     }
 
+    private boolean isStoreInJar(String path, List<String> featuresInJar) {
+        Path p = Paths.get(path);
+        return featuresInJar.contains(p.getFileName().toString());
+    }
 }

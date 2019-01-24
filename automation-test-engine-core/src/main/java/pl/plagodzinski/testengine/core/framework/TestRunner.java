@@ -28,18 +28,23 @@ public class TestRunner {
     void setupAndRunTests(Configuration configuration) {
         log.info(String.format("Find %s test module(s) in classpath", testModuleList.size()));
         JUnitCore junit = new JUnitCore();
-        configuration.getModules().forEach(moduleName -> {
-            Optional<TestModule> filteredModule = testModuleList.stream().filter(module -> module.getName().equals(moduleName)).findFirst();
-            if (filteredModule.isPresent()) {
-                try {
-                    junit.run(new EngineCucumberRunner(filteredModule.get().getClass(), configuration));
-                } catch (InitializationError initializationError) {
-                    log.error("Can't run module " + moduleName, initializationError);
+        if (configuration.getModules() != null) {
+            configuration.getModules().forEach(moduleName -> {
+                Optional<TestModule> filteredModule = testModuleList.stream().filter(module -> module.getName().equals(moduleName)).findFirst();
+                if (filteredModule.isPresent()) {
+                    try {
+                        junit.run(new EngineCucumberRunner(filteredModule.get().getClass(), configuration));
+                    } catch (InitializationError initializationError) {
+                        log.error("Can't run module " + moduleName, initializationError);
+                    }
+                } else {
+                    log.error("Not found module with name " + moduleName);
                 }
-            } else {
-                log.error("Not found module with name " + moduleName);
-            }
-        });
+            });
+        } else {
+            log.info("Not set any module to run");
+        }
+
     }
 }
 

@@ -12,6 +12,8 @@
         <module>automation-test-engine-example</module>
         <module>automation-test-engine-core</module>
         <module>automation-test-engine-api</module>
+        <module>automation-test-engine-demo</module>
+        <module>automation-test-engine-example2</module>
     </modules>
 
     <dependencyManagement>
@@ -55,11 +57,6 @@
                 <groupId>info.cukes</groupId>
                 <artifactId>cucumber-picocontainer</artifactId>
                 <version>1.2.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.aspectj</groupId>
-                <artifactId>aspectjrt</artifactId>
-                <version>1.9.2</version>
             </dependency>
             <dependency>
                 <groupId>info.cukes</groupId>

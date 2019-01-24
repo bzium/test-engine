@@ -9,5 +9,5 @@ import pl.plagodzinski.testengine.api.TestModule;
  */
 
 @org.springframework.context.annotation.Configuration
-@ComponentScan(basePackages = {"cucumberTraining"}, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = TestModule.class), useDefaultFilters = false)
+@ComponentScan(basePackages = { "cucumberTraining" , "cucumberTraining2" }, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = TestModule.class), useDefaultFilters = false)
 public class ApiConfiguration { }
