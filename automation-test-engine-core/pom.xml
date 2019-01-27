@@ -45,6 +45,20 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-rest-java-client-core</artifactId>
+        </dependency>
+        <!-- Dependencies needed to debug jira client -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+        </dependency>
+        <!-- End of jira client dependencies -->
+        <dependency>
             <groupId>pl.plagodzinski</groupId>
             <artifactId>automation-test-engine-api</artifactId>
             <version>${project.version}</version>

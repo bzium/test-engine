@@ -1,5 +1,8 @@
 package pl.plagodzinski.testengine.core.framework;
 
+import com.atlassian.jira.rest.client.api.JiraRestClient;
+import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
+import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import cucumber.runtime.StepDefinitionMatch;
 import gherkin.formatter.Argument;
 import gherkin.formatter.Reporter;
@@ -16,6 +19,13 @@ import java.util.stream.Collectors;
 
 @Log4j
 public class EngineReporter implements Reporter {
+
+    private JiraRestClient jiraRestClient;
+
+    EngineReporter() {
+        JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
+        //jiraRestClient = factory.createWithBasicHttpAuthentication(uri, JIRA_ADMIN_USERNAME, JIRA_ADMIN_PASSWORD);
+    }
 
     @Override
     public void before(Match match, Result result) {

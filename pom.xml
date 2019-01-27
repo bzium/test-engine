@@ -16,6 +16,13 @@
         <module>automation-test-engine-example2</module>
     </modules>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Deps version -->
+        <cucumber.version>1.2.5</cucumber.version>
+        <slf4j.version>1.7.25</slf4j.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -46,31 +53,57 @@
             <dependency>
                 <groupId>info.cukes</groupId>
                 <artifactId>cucumber-java</artifactId>
-                <version>1.2.4</version>
+                <version>${cucumber.version}</version>
             </dependency>
             <dependency>
                 <groupId>info.cukes</groupId>
                 <artifactId>cucumber-junit</artifactId>
-                <version>1.2.5</version>
+                <version>${cucumber.version}</version>
             </dependency>
-            <dependency>
+            <!--dependency>
                 <groupId>info.cukes</groupId>
-                <artifactId>cucumber-picocontainer</artifactId>
-                <version>1.2.4</version>
-            </dependency>
+                <artifactId>cucumber-jvm</artifactId>
+                <version>${cucumber.version}</version>
+            </dependency-->
             <dependency>
                 <groupId>info.cukes</groupId>
                 <artifactId>cucumber-core</artifactId>
-                <version>1.2.5</version>
+                <version>${cucumber.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>5.1.4.RELEASE</version>
             </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>jira-rest-java-client-core</artifactId>
+                <version>5.1.2-2bd0a62e</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>http://central.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <!-- Needed by jira client -->
+            <id>atlassian</id>
+            <url>https://m2proxy.atlassian.com/repository/public</url>
+        </repository>
+    </repositories>
 
     <build>
         <pluginManagement>
