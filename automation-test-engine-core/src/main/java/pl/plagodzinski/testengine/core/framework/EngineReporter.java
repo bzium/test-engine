@@ -3,22 +3,17 @@ package pl.plagodzinski.testengine.core.framework;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
-import cucumber.runtime.StepDefinitionMatch;
-import gherkin.formatter.Argument;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Match;
-import gherkin.formatter.model.Result;
+import cucumber.api.event.EventPublisher;
+import cucumber.api.event.TestStepStarted;
+import cucumber.api.formatter.Formatter;
 import lombok.extern.log4j.Log4j;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by pawel on 02/12/2018.
  */
 
 @Log4j
-public class EngineReporter implements Reporter {
+public class EngineReporter implements Formatter {
 
     private JiraRestClient jiraRestClient;
 
@@ -26,7 +21,7 @@ public class EngineReporter implements Reporter {
         JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
         //jiraRestClient = factory.createWithBasicHttpAuthentication(uri, JIRA_ADMIN_USERNAME, JIRA_ADMIN_PASSWORD);
     }
-
+    /*
     @Override
     public void before(Match match, Result result) {
 
@@ -57,5 +52,12 @@ public class EngineReporter implements Reporter {
     @Override
     public void write(String s) {
 
+    }
+    */
+    @Override
+    public void setEventPublisher(EventPublisher eventPublisher) {
+        eventPublisher.registerHandlerFor(TestStepStarted.class, (event) -> {
+            log.info("Step text " + event.testStep.getStepText());
+        });
     }
 }

@@ -1,5 +1,7 @@
 package pl.plagodzinski.testengine.core.framework;
 
+import cucumber.runner.EventBus;
+import cucumber.runner.TimeService;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.RuntimeOptions;
@@ -46,10 +48,14 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
     public EngineCucumberRunner(Class clazz, Configuration conf) throws InitializationError {
         super(EngineCucumberRunner.class);
         this.conf = conf;
+
         ClassLoader classLoader = clazz.getClassLoader();
+
+        EventBus eventBus = new EventBus(TimeService.SYSTEM);
 
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
+        runtimeOptions.addPlugin(new EngineReporter());
 
         // Add futures path inside jar
         runtimeOptions.getFeaturePaths().add("classpath:features/");
@@ -58,7 +64,7 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         //runtimeOptions.getGlue().add(clazz.getPackage().getName());
 
         // Add customized reporter
-        runtimeOptions.addPlugin(new EngineReporter());
+        //runtimeOptions.addPlugin(new EngineReporter());
 
         //Add tags to Runner class
         addRunnerTag(runtimeOptions);
@@ -66,21 +72,22 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         ResourceLoader resourceLoader = new MultiLoader(classLoader);
         runtime = createRuntime(resourceLoader, classLoader, runtimeOptions);
 
-        final List<CucumberFeature> cucumberFeatures = runtimeOptions.cucumberFeatures(resourceLoader);
 
+
+        final List<CucumberFeature> cucumberFeatures = runtimeOptions.cucumberFeatures(resourceLoader, eventBus);
 
         List<CucumberFeature> filteredCucumberFeatures;
         if(conf.getCountries() == null || conf.getCountries().isEmpty()) {
-            filteredCucumberFeatures = cucumberFeatures.stream().filter(cf -> checkPath(cf.getPath())).collect(Collectors.toList());
+            filteredCucumberFeatures = cucumberFeatures.stream().filter(cf -> checkPath(cf.getUri())).collect(Collectors.toList());
         } else {
             filteredCucumberFeatures = cucumberFeatures;
         }
 
         List<String> featuresInJar = listFeatureFiles(clazz);
-        filteredCucumberFeatures = filteredCucumberFeatures.stream().filter(cf -> isStoreInJar(cf.getPath(), featuresInJar)).collect(Collectors.toList());
+        filteredCucumberFeatures = filteredCucumberFeatures.stream().filter(cf -> isStoreInJar(cf.getUri(), featuresInJar)).collect(Collectors.toList());
 
         JUnitOptions jUnitOptions = new JUnitOptions(Collections.EMPTY_LIST);
-        jUnitReporter = new JUnitReporter(runtimeOptions.reporter(classLoader), runtimeOptions.formatter(classLoader), runtimeOptions.isStrict(), jUnitOptions);
+        jUnitReporter = new JUnitReporter(eventBus, runtimeOptions.isStrict(), jUnitOptions);
         addChildren(filteredCucumberFeatures);
     }
 
@@ -117,8 +124,8 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
     @Override
     public void run(RunNotifier notifier) {
         super.run(notifier);
-        jUnitReporter.done();
-        jUnitReporter.close();
+        //jUnitReporter.done();
+        //jUnitReporter.close();
         runtime.printSummary();
     }
 
@@ -131,13 +138,13 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
     private void addRunnerTag(RuntimeOptions runtimeOptions) {
         if(conf.getEnvironments() != null) {
             for(Environment envs: conf.getEnvironments()) {
-                runtimeOptions.getFilters().add("@" + envs.toString());
+                runtimeOptions.getTagFilters().add("@" + envs.toString());
             }
         }
 
         if(conf.getAdditionalTags() != null) {
             for(String additionalTag : conf.getAdditionalTags()) {
-                runtimeOptions.getFilters().add("@" + additionalTag);
+                runtimeOptions.getTagFilters().add("@" + additionalTag);
             }
         }
     }
