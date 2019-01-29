@@ -1,7 +1,6 @@
 package pl.plagodzinski.testengine.core.framework;
 
-import cucumber.runner.EventBus;
-import cucumber.runner.TimeService;
+import cucumber.api.event.TestStepStarted;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.RuntimeOptions;
@@ -22,6 +21,7 @@ import org.junit.runners.model.InitializationError;
 import pl.plagodzinski.testengine.core.config.Configuration;
 import pl.plagodzinski.testengine.core.config.Country;
 import pl.plagodzinski.testengine.core.config.Environment;
+import pl.plagodzinski.testengine.core.framework.handlers.LogStepNameHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -51,11 +51,9 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
 
         ClassLoader classLoader = clazz.getClassLoader();
 
-        EventBus eventBus = new EventBus(TimeService.SYSTEM);
-
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
-        runtimeOptions.addPlugin(new EngineReporter());
+        //runtimeOptions.addPlugin(new EngineReporter());
 
         // Add futures path inside jar
         runtimeOptions.getFeaturePaths().add("classpath:features/");
@@ -72,9 +70,9 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         ResourceLoader resourceLoader = new MultiLoader(classLoader);
         runtime = createRuntime(resourceLoader, classLoader, runtimeOptions);
 
+        registerHandlers();
 
-
-        final List<CucumberFeature> cucumberFeatures = runtimeOptions.cucumberFeatures(resourceLoader, eventBus);
+        final List<CucumberFeature> cucumberFeatures = runtimeOptions.cucumberFeatures(resourceLoader, runtime.getEventBus());
 
         List<CucumberFeature> filteredCucumberFeatures;
         if(conf.getCountries() == null || conf.getCountries().isEmpty()) {
@@ -87,7 +85,7 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
         filteredCucumberFeatures = filteredCucumberFeatures.stream().filter(cf -> isStoreInJar(cf.getUri(), featuresInJar)).collect(Collectors.toList());
 
         JUnitOptions jUnitOptions = new JUnitOptions(Collections.EMPTY_LIST);
-        jUnitReporter = new JUnitReporter(eventBus, runtimeOptions.isStrict(), jUnitOptions);
+        jUnitReporter = new JUnitReporter(runtime.getEventBus(), runtimeOptions.isStrict(), jUnitOptions);
         addChildren(filteredCucumberFeatures);
     }
 
@@ -193,5 +191,9 @@ public class EngineCucumberRunner extends ParentRunner<FeatureRunner> {
     private boolean isStoreInJar(String path, List<String> featuresInJar) {
         Path p = Paths.get(path);
         return featuresInJar.contains(p.getFileName().toString());
+    }
+
+    private void registerHandlers() {
+        runtime.getEventBus().registerHandlerFor(TestStepStarted.class, new LogStepNameHandler());
     }
 }
