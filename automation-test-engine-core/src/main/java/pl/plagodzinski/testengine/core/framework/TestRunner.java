@@ -29,29 +29,32 @@ public class TestRunner {
     void setupAndRunTests(Configuration configuration) {
         log.info(String.format("Find %s test module(s) in classpath", testModuleList.size()));
         JUnitCore junit = new JUnitCore();
-        if (configuration.getModules() != null) {
+        if (configuration.getModules() != null && !configuration.getModules().isEmpty()) {
             configuration.getModules().forEach(moduleName -> {
                 Optional<TestModule> filteredModule = testModuleList.stream().filter(module -> module.getName().equals(moduleName)).findFirst();
                 if (filteredModule.isPresent()) {
-                    try {
-                        TestModule moduleToRun = filteredModule.get();
-                        log.info("Run validation for module " + moduleToRun.getName());
-                        moduleToRun.validate();
-                        log.info("Starting tests for module " + moduleToRun.getName());
-                        junit.run(new EngineCucumberRunner(moduleToRun.getClass(), configuration));
-                    } catch (InitializationError initializationError) {
-                        log.error("Can't run module " + moduleName, initializationError);
-                    } catch (ValidateException e) {
-                        log.error("Can't run module " + moduleName + " due to validation errors", e);
-                    }
+                    runModule(junit, filteredModule.get(), configuration);
                 } else {
                     log.error("Not found module with name " + moduleName);
                 }
             });
         } else {
-            log.info("Not set any module to run");
+            log.info("No set modules to run. Run all modules find in classpath");
+            testModuleList.forEach(testModule -> runModule(junit, testModule, configuration));
         }
+    }
 
+    private void runModule(JUnitCore jUnitCore, TestModule moduleToRun, Configuration configuration) {
+        try {
+            log.info("Run validation for module " + moduleToRun.getName());
+            moduleToRun.validate();
+            log.info("Starting tests for module " + moduleToRun.getName());
+            jUnitCore.run(new EngineCucumberRunner(moduleToRun.getClass(), configuration));
+        } catch (InitializationError initializationError) {
+            log.error("Can't run module " + moduleToRun.getName(), initializationError);
+        } catch (ValidateException e) {
+            log.error("Can't run module " + moduleToRun.getName() + " due to validation errors", e);
+        }
     }
 }
 
