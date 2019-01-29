@@ -6,6 +6,7 @@ import org.junit.runners.model.InitializationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.plagodzinski.testengine.api.TestModule;
+import pl.plagodzinski.testengine.api.ValidateException;
 import pl.plagodzinski.testengine.core.config.Configuration;
 
 import java.util.List;
@@ -32,11 +33,16 @@ public class TestRunner {
             configuration.getModules().forEach(moduleName -> {
                 Optional<TestModule> filteredModule = testModuleList.stream().filter(module -> module.getName().equals(moduleName)).findFirst();
                 if (filteredModule.isPresent()) {
-                    log.info("Starting tests for module " + filteredModule.get().getName());
                     try {
-                        junit.run(new EngineCucumberRunner(filteredModule.get().getClass(), configuration));
+                        TestModule moduleToRun = filteredModule.get();
+                        log.info("Run validation for module " + moduleToRun.getName());
+                        moduleToRun.validate();
+                        log.info("Starting tests for module " + moduleToRun.getName());
+                        junit.run(new EngineCucumberRunner(moduleToRun.getClass(), configuration));
                     } catch (InitializationError initializationError) {
                         log.error("Can't run module " + moduleName, initializationError);
+                    } catch (ValidateException e) {
+                        log.error("Can't run module " + moduleName + " due to validation errors", e);
                     }
                 } else {
                     log.error("Not found module with name " + moduleName);
