@@ -60,11 +60,6 @@
                 <artifactId>cucumber-junit</artifactId>
                 <version>${cucumber.version}</version>
             </dependency>
-            <!--dependency>
-                <groupId>io.cucumber</groupId>
-                <artifactId>cucumber-jvm</artifactId>
-                <version>${cucumber.version}</version>
-            </dependency-->
             <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-core</artifactId>
