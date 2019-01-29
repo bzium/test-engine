@@ -24,7 +24,7 @@ public class ModuleCmdCommand implements CmdCommand {
         if(moduleNames != null) {
             log.info("Set test modules: " + Arrays.toString(moduleNames));
             List<String> moduleToUse = Arrays.asList(moduleNames);
-            configuration.setModules(moduleToUse);;
+            configuration.setModules(moduleToUse);
         }
     }
 
